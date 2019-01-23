@@ -16,7 +16,7 @@
     <div class="navbar navbar-dark bg-dark">
         <a href="#" class="navbar-brand">Laravel</a>
     </div>
-    <div class="container">
+    <div class="d-flex justify-content-center mx-auto">
         @yield('content')
     </div>
 </body>

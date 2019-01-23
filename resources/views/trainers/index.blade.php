@@ -1,17 +1,18 @@
 @extends('layouts.app')
 @section('title','List Trainer')
 @section('content')
-<div class="row">
+<div class="row pt-2">
     @foreach ($trainers as $trainer)
-    <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="..." alt="Card image cap">
-        <div class="card-body">
-            <h5 class="card-title">{{$trainer->name}}</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-                content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-md-3" style="width:18rem">
+        <div class="card">
+            <img class="card-img-top rounded-circle mx-auto pt-2"  src="/images/{{$trainer->avatar}}" alt="Card image cap"  style="height:100px;width:100px">
+            <div class="card-body">
+                <h5 class="card-title">{{$trainer->name}}</h5>
+                <p class="card-text text-center">{{$trainer->description}}</p>
+                <a href="/trainers/{{$trainer->slug}}" class="btn btn-primary">Ver más..</a>
+            </div>
         </div>
     </div>
+    @endforeach
 </div>
-@endforeach
 @endsection

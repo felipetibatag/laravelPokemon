@@ -40,16 +40,18 @@ class TrainerController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->hasFile('avatar')) { //Verificar que llegue algo en la variable
-            $archivoImagen = $request . file('avatar'); //Recibir el archivo desde el formulario e indicar que es tipo archivo.
+        //Verificar que llegue algo en la variable
+        if ($request->hasFile('avatar')) {
+            $archivoImagen = $request->file('avatar'); //Recibir el archivo desde el formulario e indicar que es tipo archivo.
             $nombreArchivo = time() . $archivoImagen->getClientOriginalName(); //asignar un nombre que no se repita en el servidor
-            $archivoImagen->move(public_path() .
-                '/images/', $nombreArchivo); // mover ahora el archivo a la carpeta publica del servidor
+            $archivoImagen->move(public_path() . '/images/', $nombreArchivo); // mover ahora el archivo a la carpeta publica del servidor
         }
         $trainer = new Trainer();
         $trainer->name = $request->input("nombre");
         $trainer->avatar = $nombreArchivo;
+        $trainer->description = $request->input("description");
         $trainer->save();
+        return "Guardado";
 
     }
 
@@ -59,9 +61,10 @@ class TrainerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Trainer $trainer)
     {
-        //
+
+        return view('trainers.show', compact('trainer'));
     }
 
     /**
@@ -70,9 +73,10 @@ class TrainerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Trainer $trainer)
     {
         //
+        return view("trainers.edit", compact('trainer'));
     }
 
     /**
@@ -82,9 +86,20 @@ class TrainerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Trainer $trainer)
     {
-        //
+        $trainer->fill($request->except('avatar'));
+        if ($request->hasFile('avatar')) {
+            $archivoImagen = $request->file('avatar');
+            $nombreArchivo = time() . $archivoImagen->getClientOriginalName();
+            $archivoImagen->move(public_path() . '/images/', $nombreArchivo);
+            $trainer->avatar = $nombreArchivo;
+        } else {
+            $trainer->avatar = $trainer->avatar;
+        }
+        $trainer->save();
+
+        return "actualizado";
     }
 
     /**
