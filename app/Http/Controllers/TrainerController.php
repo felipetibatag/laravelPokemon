@@ -4,6 +4,7 @@ namespace LaravelPrueba\Http\Controllers;
 
 use Illuminate\Http\Request;
 use LaravelPrueba\Trainer;
+use LaravelPrueba\Http\Requests\StoreTrainerRequest;
 
 class TrainerController extends Controller
 {
@@ -12,9 +13,9 @@ class TrainerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public
-        function index()
+    public function index(Request $request)
     {
+        $request->user()->authorizedRoles(['user', 'admin']);
         //
         $trainers = Trainer::all();
         return view('trainers.index', compact('trainers'));
@@ -38,7 +39,7 @@ class TrainerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTrainerRequest $request)
     {
         //Verificar que llegue algo en la variable
         if ($request->hasFile('avatar')) {
@@ -47,11 +48,12 @@ class TrainerController extends Controller
             $archivoImagen->move(public_path() . '/images/', $nombreArchivo); // mover ahora el archivo a la carpeta publica del servidor
         }
         $trainer = new Trainer();
-        $trainer->name = $request->input("nombre");
+        $trainer->name = $request->input("name");
         $trainer->avatar = $nombreArchivo;
         $trainer->description = $request->input("description");
+        $trainer->slug = time() . $request->input("name");
         $trainer->save();
-        return "Guardado";
+        return redirect()->route('trainers.index');
 
     }
 
@@ -98,8 +100,7 @@ class TrainerController extends Controller
             $trainer->avatar = $trainer->avatar;
         }
         $trainer->save();
-
-        return "actualizado";
+        return redirect()->route('trainers.show', $trainer)->with("status", "Actualizado Correctamente");
     }
 
     /**
@@ -108,9 +109,11 @@ class TrainerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public
-        function destroy($id)
+    public function destroy(Trainer $trainer)
     {
-        //
+        $rutaImagen = public_path() . '/images/' . $trainer->avatar;
+        \File::delete($rutaImagen);
+        $trainer->delete();
+        return redirect()->route('trainers.index');
     }
 }
